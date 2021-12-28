@@ -1,14 +1,33 @@
 const game = {
-  start: function () {
-    const canvas = document.getElementById("mycanvas");
-    const ctx = canvas.getContext("2d");
-
-    const background = new Image();
-    background.src = "img/background.png";
-    background.addEventListener("load", () => {
-      window.requestAnimationFrame(() => {
-        ctx.drawImage(background, 0, 0);
-      });
+  canvas: null,
+  ctx: null,
+  sprites: {
+    background: null,
+    cell: null,
+  },
+  start() {
+    this.canvas = document.getElementById("mycanvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.preload(() => this.run());
+  },
+  preload(callback) {
+    let loaded = 0;
+    const required = 2;
+    const onAssetLoad = () => {
+      ++loaded;
+      if (loaded >= required) {
+        callback();
+      }
+    };
+    for (let key in this.sprites) {
+      this.sprites[key] = new Image();
+      this.sprites[key].src = `img/${key}.png`;
+      this.sprites[key].addEventListener("load", onAssetLoad);
+    }
+  },
+  run() {
+    window.requestAnimationFrame(() => {
+      this.ctx.drawImage(this.sprites.background, 0, 0);
     });
   },
 };
