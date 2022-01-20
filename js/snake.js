@@ -1,11 +1,33 @@
 game.snake = {
   game: game,
   cells: [],
+  moving: false,
+  direction: false,
+  directions: {
+    up: {
+      row: -1,
+      col: 0,
+    },
+    down: {
+      row: 1,
+      col: 0,
+    },
+    left: {
+      row: 0,
+      col: -1,
+    },
+    right: {
+      row: 0,
+      col: 1,
+    },
+  },
   create() {
-    let startCells = [
+    const startCells = [
       { row: 7, col: 7 },
       { row: 8, col: 7 },
     ];
+    this.direction = this.directions.up;
+
     for (let startCell of startCells) {
       this.cells.push(this.game.board.getCell(startCell.row, startCell.col));
     }
@@ -14,5 +36,42 @@ game.snake = {
     this.cells.forEach((cell) => {
       this.game.ctx.drawImage(this.game.sprites.body, cell.x, cell.y);
     });
+  },
+  start(keyCode) {
+    this.moving = true;
+    switch (keyCode) {
+      case 38:
+        this.direction = this.directions.up;
+        break;
+      case 37:
+        this.direction = this.directions.left;
+        break;
+      case 39:
+        this.direction = this.directions.right;
+        break;
+      case 40:
+        this.direction = this.directions.down;
+        break;
+    }
+  },
+  move() {
+    if (!this.moving) {
+      return;
+    }
+    const cell = this.getNextCell();
+    if (cell) {
+      this.cells.unshift(cell);
+      this.cells.pop();
+    }
+  },
+  hasCell(cell) {
+    return this.cells.find((part) => part === cell);
+  },
+  getNextCell() {
+    const head = this.cells[0];
+    const row = head.row + this.direction.row;
+    const col = head.col + this.direction.col;
+
+    return this.game.board.getCell(row, col);
   },
 };

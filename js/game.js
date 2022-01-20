@@ -19,6 +19,10 @@ const game = {
     background: null,
     cell: null,
     body: null,
+    food: null,
+  },
+  randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   },
   start() {
     this.init();
@@ -68,11 +72,18 @@ const game = {
       this.sprites[key].addEventListener("load", onAssetLoad);
     }
   },
-  run() {
+  create() {
     this.board.create();
     this.snake.create();
+    this.board.createFood();
 
+    window.addEventListener("keydown", ({ keyCode }) => {
+      this.snake.start(keyCode);
+    });
+  },
+  render() {
     window.requestAnimationFrame(() => {
+      this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.drawImage(
         this.sprites.background,
         (this.width - this.sprites.background.width) / 2,
@@ -81,6 +92,16 @@ const game = {
       this.board.render();
       this.snake.render();
     });
+  },
+  update() {
+    this.snake.move();
+    this.render();
+  },
+  run() {
+    this.create();
+    setInterval(() => {
+      this.update();
+    }, 150);
   },
 };
 
