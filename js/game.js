@@ -18,8 +18,10 @@ const game = {
   sprites: {
     background: null,
     cell: null,
+    head: null,
     body: null,
     food: null,
+    bomb: null,
   },
   randomInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -76,6 +78,7 @@ const game = {
     this.board.create();
     this.snake.create();
     this.board.createFood();
+    this.board.createBomb();
 
     window.addEventListener("keydown", ({ keyCode }) => {
       this.snake.start(keyCode);
@@ -102,6 +105,11 @@ const game = {
     setInterval(() => {
       this.update();
     }, 150);
+    setInterval(() => {
+      if (this.snake.moving) {
+        this.board.createBomb();
+      }
+    }, 3000);
   },
 };
 

@@ -7,18 +7,22 @@ game.snake = {
     up: {
       row: -1,
       col: 0,
+      angle: 0,
     },
     down: {
       row: 1,
       col: 0,
+      angle: 180,
     },
     left: {
       row: 0,
       col: -1,
+      angle: 270,
     },
     right: {
       row: 0,
       col: 1,
+      angle: 90,
     },
   },
   create() {
@@ -32,10 +36,28 @@ game.snake = {
       this.cells.push(this.game.board.getCell(startCell.row, startCell.col));
     }
   },
+  renderHead() {
+    const head = this.cells[0];
+    const halfSize = this.game.sprites.head.width / 2;
+    this.game.ctx.save();
+    this.game.ctx.translate(head.x, head.y);
+    this.game.ctx.translate(halfSize, halfSize);
+    this.game.ctx.rotate((this.direction.angle * Math.PI) / 180);
+    this.game.ctx.drawImage(this.game.sprites.head, -halfSize, -halfSize);
+    this.game.ctx.restore();
+  },
+  renderBody() {
+    for (let i = 1; i < this.cells.length; i++) {
+      this.game.ctx.drawImage(
+        this.game.sprites.body,
+        this.cells[i].x,
+        this.cells[i].y
+      );
+    }
+  },
   render() {
-    this.cells.forEach((cell) => {
-      this.game.ctx.drawImage(this.game.sprites.body, cell.x, cell.y);
-    });
+    this.renderHead();
+    this.renderBody();
   },
   start(keyCode) {
     this.moving = true;
@@ -61,7 +83,11 @@ game.snake = {
     const cell = this.getNextCell();
     if (cell) {
       this.cells.unshift(cell);
-      this.cells.pop();
+      if (!this.game.board.isFoodCell(cell)) {
+        this.cells.pop();
+      } else {
+        this.game.board.createFood();
+      }
     }
   },
   hasCell(cell) {
