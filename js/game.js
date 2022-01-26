@@ -5,6 +5,7 @@ const game = {
   snake: null,
   width: 0,
   height: 0,
+  score: 0,
   gameInterval: null,
   bombInterval: null,
   dimensions: {
@@ -25,6 +26,11 @@ const game = {
     food: null,
     bomb: null,
   },
+  sounds: {
+    bomb: null,
+    food: null,
+    theme: null,
+  },
   randomInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   },
@@ -36,6 +42,11 @@ const game = {
     this.canvas = document.getElementById("mycanvas");
     this.ctx = this.canvas.getContext("2d");
     this.initDimensions();
+    this.setTextFont();
+  },
+  setTextFont() {
+    this.ctx.font = "20px Cactus";
+    this.ctx.fillStyle = "#FFFFFF";
   },
   initDimensions() {
     const data = {
@@ -63,17 +74,33 @@ const game = {
   },
   preload(callback) {
     let loaded = 0;
-    const required = Object.keys(this.sprites).length;
+    const required =
+      Object.keys(this.sprites).length + Object.keys(this.sounds).length;
+
     const onAssetLoad = () => {
       ++loaded;
       if (loaded >= required) {
         callback();
       }
     };
+
+    this.preloadSprites(onAssetLoad);
+    this.preloadSounds(onAssetLoad);
+  },
+  preloadSprites(onAssetLoad) {
     for (let key in this.sprites) {
       this.sprites[key] = new Image();
       this.sprites[key].src = `img/${key}.png`;
       this.sprites[key].addEventListener("load", onAssetLoad);
+    }
+  },
+  preloadSounds(onAssetLoad) {
+    for (let key in this.sounds) {
+      this.sounds[key] = new Audio();
+      this.sounds[key].src = `sounds/${key}.mp3`;
+      this.sounds[key].addEventListener("canplaythrough", onAssetLoad, {
+        once: true,
+      });
     }
   },
   create() {
@@ -96,6 +123,7 @@ const game = {
       );
       this.board.render();
       this.snake.render();
+      this.ctx.fillText("Score: " + this.score, 30, 30);
     });
   },
   update() {
@@ -114,11 +142,21 @@ const game = {
     }, 3000);
   },
   stop() {
+    this.sounds.bomb.play();
     clearInterval(this.gameInterval);
     clearInterval(this.bombInterval);
     alert("Game over");
     window.location.reload();
   },
+  onSnakeStart() {
+    this.sounds.theme.loop = true;
+    this.sounds.theme.play();
+  },
+  onSnakeEat() {
+    ++this.score;
+    this.sounds.food.play();
+    this.board.createFood();
+  },
 };
 
-game.start();
+window.addEventListener("load", () => game.start());
