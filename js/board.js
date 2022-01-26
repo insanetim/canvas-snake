@@ -25,7 +25,7 @@ game.board = {
   },
   getRandomAvailableCell() {
     const pool = this.cells.filter(
-      (cell) => !cell.hasFood && !cell.hasBomb && !this.game.snake.hasCell(cell)
+      (cell) => !cell.type && !this.game.snake.hasCell(cell)
     );
     const index = game.randomInteger(0, pool.length - 1);
     return pool[index];

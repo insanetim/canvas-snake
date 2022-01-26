@@ -5,6 +5,8 @@ const game = {
   snake: null,
   width: 0,
   height: 0,
+  gameInterval: null,
+  bombInterval: null,
   dimensions: {
     max: {
       width: 640,
@@ -102,14 +104,20 @@ const game = {
   },
   run() {
     this.create();
-    setInterval(() => {
+    this.gameInterval = setInterval(() => {
       this.update();
     }, 150);
-    setInterval(() => {
+    this.bombInterval = setInterval(() => {
       if (this.snake.moving) {
         this.board.createBomb();
       }
     }, 3000);
+  },
+  stop() {
+    clearInterval(this.gameInterval);
+    clearInterval(this.bombInterval);
+    alert("Game over");
+    window.location.reload();
   },
 };
 

@@ -81,6 +81,9 @@ game.snake = {
       return;
     }
     const cell = this.getNextCell();
+    if (!cell || this.hasCell(cell) || this.game.board.isBombCell(cell)) {
+      this.game.stop();
+    }
     if (cell) {
       this.cells.unshift(cell);
       if (!this.game.board.isFoodCell(cell)) {
